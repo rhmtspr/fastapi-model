@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Acne Detection</title>
+  <style>
+    .spinner {
+      margin: auto;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h2>Upload an image for acne detection</h2>
+  <input type="file" id="imageInput" />
+  <button onclick="uploadImage()">Submit</button>
+  <div id="loading" style="display: none; text-align: center;">
+    <p>Loading, please wait...</p>
+    <div class="spinner"></div>
+  </div>
+
+  <h3>Detection Result Image:</h3>
+  <img src="" alt="" id="resultImage" style="max-width: 500px; display: none;">
+
+  <h3>Detected Acne Types:</h3>
+  <ul id="detections"></ul>
+
+  <h3>Treatment Recommendations:</h3>
+  <div id="recommendations"></div>
+
+  <!-- <script>
+    async function uploadImage() {
+      const input = document.getElementById("imageInput");
+      const file = input.files[0];
+      const loading = document.getElementById("loading");
+      const imgElement = document.getElementById("outputImage");
+
+      if (!file) {
+        alert("Please select an image first.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        loading.style.display = "block";
+        imgElement.style.display = "none";
+
+        const response = await fetch("http://localhost:8000/predict/", {
+          method: "POST",
+          body: formData,
+        });
+
+        
+        const blob = await response.blob();
+        const imgUrl = URL.createObjectURL(blob);
+
+        imgElement.src = imgUrl;
+        imgElement.style.display = "block";
+
+      } catch (error) {
+        throw new Error("Failed to get response from server");
+      } finally {
+        loading.style.display = "none";
+      }
+    }
+  </script> -->
+
+  <script>
+    async function uploadImage() {
+      const input = document.getElementById("imageInput");
+      const file = input.files[0];
+    
+      if (!file) {
+        alert("Please select an image.");
+        return;
+      }
+
+      document.getElementById("loading").style.display = "block";
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        loading.style.display = "block";
+
+        const response = await fetch("http://localhost:8000/predict/", {
+          method: "POST",
+          body: formData,
+        });
+
+      const data = await response.json();
+      document.getElementById("loading").style.display = "none";
+
+      const resultImage = document.getElementById("resultImage");
+      resultImage.src = "http://localhost:8000" + data.result_image;
+
+      console.log(data.result_image);
+
+      const detectionsList = document.getElementById("detections");
+      detectionsList.innerHTML = "";
+      data.detections.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.label}`;
+        detectionsList.appendChild(li);
+      });
+
+      const recommendationsBox = document.getElementById("recommendations");
+      recommendationsBox.innerHTML = "";
+
+      Object.entries(data.recommendations).forEach(([acneType, tips]) => {
+        const title = document.createElement("h4");
+        title.textContent = acneType;
+        recommendationsBox.appendChild(title);
+
+        const ul = document.createElement("ul");
+        tips.forEach(tip => {
+          const li = document.createElement("li");
+          li.textContent = tip;
+          ul.appendChild(li);
+        });
+
+        recommendationsBox.appendChild(ul);
+      });
+
+      console.log(data.recommendations)
+      resultImage.style.display = "block";
+
+      } catch (error) {
+        console.error("Error", error);
+        document.getElementById("loading").style.display = "none";
+        alert("Failed to connect to server.");
+      } finally {
+        loading.style.display = "none";
+      }
+    };
+  </script>
+</body>
+</html>
