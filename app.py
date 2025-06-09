@@ -23,7 +23,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 model = YOLO("best.pt")
 
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = "/tmp/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def get_recommendations(labels):
