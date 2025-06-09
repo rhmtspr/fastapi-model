@@ -4,6 +4,7 @@ from ultralytics import YOLO
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+import torch
 import shutil
 import uuid
 import os
